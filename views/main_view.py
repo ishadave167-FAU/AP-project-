@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QLineEdit, QComboBox, QSizePolicy,
-    QRadioButton, QButtonGroup
+    QRadioButton, QButtonGroup, QFileDialog
 )
 from PySide6.QtCore import QTimer, Qt
 
@@ -232,12 +232,14 @@ class OfflineWindow(QWidget):
         self.channel_combo = QComboBox()
         self.channel_combo.addItems(CHANNEL_ITEMS)
         self.plot_btn = QPushButton("Plot")
+        self.save_btn = QPushButton("Save Plot")
 
         controls.addWidget(QLabel("Mode:"))
         controls.addWidget(self.mode_combo)
         controls.addWidget(QLabel("Channel:"))
         controls.addWidget(self.channel_combo)
         controls.addWidget(self.plot_btn)
+        controls.addWidget(self.save_btn)
         controls.addStretch()
         layout.addLayout(controls)
 
@@ -247,6 +249,7 @@ class OfflineWindow(QWidget):
         layout.addWidget(self.mpl_canvas)
 
         self.plot_btn.clicked.connect(self._do_plot)
+        self.save_btn.clicked.connect(self._save_plot)
         self._do_plot()
 
     def _do_plot(self):
@@ -270,3 +273,14 @@ class OfflineWindow(QWidget):
         self.ax.grid(True, alpha=0.3)
         self.fig.tight_layout()
         self.mpl_canvas.draw()
+
+    def _save_plot(self):
+        filename, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Plot",
+            "emg_plot.png",
+            "PNG Files (*.png);;PDF Files (*.pdf);;All Files (*)"
+        )
+
+        if filename:
+            self.fig.savefig(filename, dpi=300, bbox_inches="tight")
