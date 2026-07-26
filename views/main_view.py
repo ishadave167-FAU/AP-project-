@@ -242,6 +242,17 @@ class OfflineWindow(QWidget):
         controls.addWidget(self.save_btn)
         controls.addStretch()
         layout.addLayout(controls)
+        info_layout = QHBoxLayout()
+
+        self.sampling_label = QLabel(f"Sampling Rate: {int(SAMPLE_RATE)} Hz")
+        self.duration_label = QLabel("Recording Duration: 0.00 s")
+
+        info_layout.addWidget(self.sampling_label)
+        info_layout.addSpacing(30)
+        info_layout.addWidget(self.duration_label)
+        info_layout.addStretch()
+
+        layout.addLayout(info_layout)
 
         from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
         self.fig, self.ax = plt.subplots(figsize=(9, 4))
@@ -259,6 +270,8 @@ class OfflineWindow(QWidget):
         signal = data[ch]
 
         fill = self.viewmodel.get_buffer_fill()
+        duration = fill / SAMPLE_RATE
+        self.duration_label.setText(f"Recording Duration: {duration:.2f} s")
         if fill < BUFFER_SIZE:
             signal = signal[-fill:] if fill > 0 else signal
             t = np.linspace(-fill / SAMPLE_RATE, 0, len(signal))
