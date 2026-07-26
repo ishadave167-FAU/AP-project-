@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QLineEdit, QComboBox, QSizePolicy,
-    QRadioButton, QButtonGroup, QFileDialog
+    QRadioButton, QButtonGroup, QFileDialog, QMessageBox
 )
 from PySide6.QtCore import QTimer, Qt
 
@@ -279,8 +279,24 @@ class OfflineWindow(QWidget):
             self,
             "Save Plot",
             "emg_plot.png",
-            "PNG Files (*.png);;PDF Files (*.pdf);;All Files (*)"
+            "PNG Files (*.png);;PDF Files (*.pdf);;SVG Files (*.svg);;All Files (*)"
         )
 
-        if filename:
+        if not filename:
+            return
+
+        try:
             self.fig.savefig(filename, dpi=300, bbox_inches="tight")
+
+            QMessageBox.information(
+                self,
+                "Success",
+                "Plot saved successfully!"
+            )
+
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Failed to save plot:\n{e}"
+            )
